@@ -1,0 +1,15 @@
+git_url(ENV["MATCH_GIT_URL"])
+
+storage_mode("git")
+
+type("appstore")
+
+app_identifier("com.lynxtemplate")
+
+team_id("TEAM_ID_PLACEHOLDER")
+
+# Optional: Specify branch
+# git_branch("main")
+
+# For CI, use readonly mode and decrypt key from environment
+readonly(is_ci)

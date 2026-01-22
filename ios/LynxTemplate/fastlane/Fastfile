@@ -1,0 +1,64 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Sync certificates and profiles using Match"
+  lane :sync_certs do
+    match(type: "appstore", readonly: true)
+    match(type: "adhoc", readonly: true)
+  end
+
+  desc "Build for App Store"
+  lane :release do
+    sync_certs
+
+    build_app(
+      workspace: "LynxTemplate.xcworkspace",
+      scheme: "LynxTemplate",
+      export_method: "app-store",
+      output_directory: "./fastlane/output",
+      output_name: "LynxTemplate.ipa"
+    )
+  end
+
+  desc "Build for Ad-Hoc distribution"
+  lane :adhoc do
+    match(type: "adhoc", readonly: true)
+
+    build_app(
+      workspace: "LynxTemplate.xcworkspace",
+      scheme: "LynxTemplate",
+      export_method: "ad-hoc",
+      output_directory: "./fastlane/output",
+      output_name: "LynxTemplate-adhoc.ipa"
+    )
+  end
+
+  desc "Build for Development"
+  lane :build do
+    match(type: "development", readonly: true)
+
+    build_app(
+      workspace: "LynxTemplate.xcworkspace",
+      scheme: "LynxTemplate",
+      export_method: "development",
+      output_directory: "./fastlane/output",
+      output_name: "LynxTemplate-dev.ipa"
+    )
+  end
+
+  desc "Upload to App Store Connect"
+  lane :upload do
+    upload_to_app_store(
+      skip_screenshots: true,
+      skip_metadata: true
+    )
+  end
+
+  desc "Upload to TestFlight"
+  lane :beta do
+    release
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+end

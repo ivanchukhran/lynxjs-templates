@@ -1,0 +1,27 @@
+# Local
+.DS_Store
+*.local
+*.log*
+
+# IDE
+.vscode/
+.idea/
+
+# iOS
+ios/*/Pods/
+ios/*/*.xcworkspace/
+*.xcuserstate
+xcuserdata/
+DerivedData/
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.apk
+*.aab
+
+# Bundles (user will add these)
+ios/*/Resources/main.lynx.bundle
+android/app/src/main/assets/main.lynx.bundle
