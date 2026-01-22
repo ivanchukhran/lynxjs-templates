@@ -1,0 +1,147 @@
+name: Build iOS & Android
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: 'App name'
+        required: true
+        default: 'MyApp'
+      bundle_id:
+        description: 'Bundle/Package ID'
+        required: true
+        default: 'com.example.myapp'
+      lynx_bundle_url:
+        description: 'URL to download main.lynx.bundle (or artifact name)'
+        required: true
+
+env:
+  APP_NAME: ${{ github.event.inputs.app_name }}
+  BUNDLE_ID: ${{ github.event.inputs.bundle_id }}
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout template
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup project
+        run: |
+          ./scripts/setup.sh \
+            --name "$APP_NAME" \
+            --bundle-id "$BUNDLE_ID" \
+            --skip-git
+
+      - name: Download LynxJS bundle
+        run: |
+          curl -L "${{ github.event.inputs.lynx_bundle_url }}" -o main.lynx.bundle
+          cp main.lynx.bundle android/app/src/main/assets/
+
+      - name: Decode keystore
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/keystore.jks
+
+      - name: Build Android APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -f "android/app/keystore.jks" ]; then
+            ./scripts/build-android.sh \
+              --build-type release \
+              --output-type apk \
+              --keystore "$(pwd)/android/app/keystore.jks" \
+              --output ./artifacts
+          else
+            ./scripts/build-android.sh \
+              --build-type debug \
+              --output-type apk \
+              --output ./artifacts
+          fi
+
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ env.APP_NAME }}
+          path: artifacts/*.apk
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout template
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Setup project
+        run: |
+          ./scripts/setup.sh \
+            --name "$APP_NAME" \
+            --bundle-id "$BUNDLE_ID" \
+            --ios-team-id "${{ secrets.APPLE_TEAM_ID }}" \
+            --skip-git
+
+      - name: Download LynxJS bundle
+        run: |
+          curl -L "${{ github.event.inputs.lynx_bundle_url }}" -o main.lynx.bundle
+          cp main.lynx.bundle "ios/$APP_NAME/Resources/"
+
+      - name: Install CocoaPods
+        run: |
+          cd "ios/$APP_NAME"
+          pod install
+
+      - name: Install fastlane
+        run: |
+          cd "ios/$APP_NAME"
+          bundle install
+
+      - name: Setup Match certificates
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
+        run: |
+          cd "ios/$APP_NAME"
+          bundle exec fastlane sync_certs
+
+      - name: Build iOS IPA
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
+        run: |
+          cd "ios/$APP_NAME"
+          bundle exec fastlane adhoc
+
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-${{ env.APP_NAME }}
+          path: ios/${{ env.APP_NAME }}/fastlane/output/*.ipa
+
+  # Optional: Build triggered by another workflow that builds the LynxJS app
+  # build-from-lynx-artifact:
+  #   needs: [build-lynx-app]  # Your LynxJS build job
+  #   ...
