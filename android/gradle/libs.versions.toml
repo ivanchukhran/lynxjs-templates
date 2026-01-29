@@ -1,47 +1,42 @@
 [versions]
-agp = "8.2.0"
-kotlin = "1.9.0"
+agp = "9.0.0"
+animatedGif = "2.3.0"
 coreKtx = "1.10.1"
-appcompat = "1.6.1"
-material = "1.10.0"
+fresco = "2.3.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-lynx = "3.6.0"
-lynxService = "3.5.1"
-primjs = "3.6.1"
-fresco = "2.3.0"
+appcompat = "1.6.1"
+lynxJssdk = "3.6.0"
+lynxServiceLog = "3.5.1"
+material = "1.10.0"
 okhttp = "4.9.0"
+primjs = "3.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+animated-base = { module = "com.facebook.fresco:animated-base", version.ref = "animatedGif" }
+animated-gif = { module = "com.facebook.fresco:animated-gif", version.ref = "animatedGif" }
+animated-webp = { module = "com.facebook.fresco:animated-webp", version.ref = "animatedGif" }
+fresco = { module = "com.facebook.fresco:fresco", version.ref = "fresco" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-
-# Lynx
-lynx = { module = "org.lynxsdk.lynx:lynx", version.ref = "lynx" }
-lynx-jssdk = { module = "org.lynxsdk.lynx:lynx-jssdk", version.ref = "lynx" }
-lynx-trace = { module = "org.lynxsdk.lynx:lynx-trace", version.ref = "lynx" }
-primjs = { module = "org.lynxsdk.lynx:primjs", version.ref = "primjs" }
-lynx-service-image = { module = "org.lynxsdk.lynx:lynx-service-image", version.ref = "lynx" }
-lynx-service-log = { module = "org.lynxsdk.lynx:lynx-service-log", version.ref = "lynxService" }
-lynx-service-http = { module = "org.lynxsdk.lynx:lynx-service-http", version.ref = "lynxService" }
-xelement = { module = "org.lynxsdk.lynx:xelement", version.ref = "lynxService" }
-xelement-input = { module = "org.lynxsdk.lynx:xelement-input", version.ref = "lynxService" }
-
-# Fresco
-fresco = { module = "com.facebook.fresco:fresco", version.ref = "fresco" }
-animated-gif = { module = "com.facebook.fresco:animated-gif", version.ref = "fresco" }
-animated-webp = { module = "com.facebook.fresco:animated-webp", version.ref = "fresco" }
-webpsupport = { module = "com.facebook.fresco:webpsupport", version.ref = "fresco" }
-animated-base = { module = "com.facebook.fresco:animated-base", version.ref = "fresco" }
-
-# Network
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+lynx = { module = "org.lynxsdk.lynx:lynx", version.ref = "lynxJssdk" }
+lynx-devtool = { module = "org.lynxsdk.lynx:lynx-devtool", version.ref = "lynxJssdk" }
+lynx-jssdk = { module = "org.lynxsdk.lynx:lynx-jssdk", version.ref = "lynxJssdk" }
+lynx-service-devtool = { module = "org.lynxsdk.lynx:lynx-service-devtool", version.ref = "lynxJssdk" }
+lynx-service-http = { module = "org.lynxsdk.lynx:lynx-service-http", version.ref = "lynxServiceLog" }
+lynx-service-image = { module = "org.lynxsdk.lynx:lynx-service-image", version.ref = "lynxJssdk" }
+lynx-service-log = { module = "org.lynxsdk.lynx:lynx-service-log", version.ref = "lynxServiceLog" }
+lynx-trace = { module = "org.lynxsdk.lynx:lynx-trace", version.ref = "lynxJssdk" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+primjs = { module = "org.lynxsdk.lynx:primjs", version.ref = "primjs" }
+webpsupport = { module = "com.facebook.fresco:webpsupport", version.ref = "animatedGif" }
+xelement = { module = "org.lynxsdk.lynx:xelement", version.ref = "lynxServiceLog" }
+xelement-input = { module = "org.lynxsdk.lynx:xelement-input", version.ref = "lynxServiceLog" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
