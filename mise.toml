@@ -1,0 +1,4 @@
+[tools]
+gradle = "9.1"
+java = "latest"
+ruby = "latest"
