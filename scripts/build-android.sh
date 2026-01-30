@@ -12,6 +12,7 @@ set -e
 #   --keystore-pass   Keystore password (or use KEYSTORE_PASSWORD env var)
 #   --key-alias       Key alias (or use KEY_ALIAS env var)
 #   --key-pass        Key password (or use KEY_PASSWORD env var)
+#   --use-fastlane    Use fastlane instead of direct Gradle
 #   --help, -h        Show this help
 
 BUILD_TYPE="release"
@@ -21,6 +22,7 @@ KEYSTORE_PATH=""
 KEYSTORE_PASS="${KEYSTORE_PASSWORD:-}"
 KEY_ALIAS="${KEY_ALIAS:-}"
 KEY_PASS="${KEY_PASSWORD:-}"
+USE_FASTLANE=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -52,6 +54,10 @@ while [[ $# -gt 0 ]]; do
             KEY_PASS="$2"
             shift 2
             ;;
+        --use-fastlane)
+            USE_FASTLANE=true
+            shift
+            ;;
         --help|-h)
             head -20 "$0" | tail -17
             exit 0
@@ -68,37 +74,63 @@ ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 echo "Building Android app"
 echo "Build type: $BUILD_TYPE"
 echo "Output type: $OUTPUT_TYPE"
+[ "$USE_FASTLANE" = true ] && echo "Using: fastlane"
 
 cd "$ROOT_DIR/android"
 mkdir -p "$ROOT_DIR/$OUTPUT_DIR"
 
-# Determine gradle task
+# Determine output extension
 if [ "$OUTPUT_TYPE" = "bundle" ]; then
-    if [ "$BUILD_TYPE" = "release" ]; then
-        GRADLE_TASK="bundleRelease"
-    else
-        GRADLE_TASK="bundleDebug"
-    fi
     OUTPUT_EXT="aab"
 else
-    if [ "$BUILD_TYPE" = "release" ]; then
-        GRADLE_TASK="assembleRelease"
-    else
-        GRADLE_TASK="assembleDebug"
-    fi
     OUTPUT_EXT="apk"
 fi
 
-# Build with signing if keystore provided
-if [ -n "$KEYSTORE_PATH" ] && [ "$BUILD_TYPE" = "release" ]; then
-    echo "Building with signing..."
-    ./gradlew "$GRADLE_TASK" \
-        -Pandroid.injected.signing.store.file="$KEYSTORE_PATH" \
-        -Pandroid.injected.signing.store.password="$KEYSTORE_PASS" \
-        -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
-        -Pandroid.injected.signing.key.password="$KEY_PASS"
+# Build using fastlane or direct Gradle
+if [ "$USE_FASTLANE" = true ]; then
+    # Ensure bundle is installed
+    if [ -f "Gemfile" ]; then
+        bundle check || bundle install
+    fi
+
+    # Determine fastlane lane
+    if [ "$OUTPUT_TYPE" = "bundle" ]; then
+        FASTLANE_LANE="build_bundle"
+    elif [ "$BUILD_TYPE" = "release" ]; then
+        FASTLANE_LANE="build_release"
+    else
+        FASTLANE_LANE="build_debug"
+    fi
+
+    echo "Running fastlane $FASTLANE_LANE..."
+    bundle exec fastlane "$FASTLANE_LANE"
 else
-    ./gradlew "$GRADLE_TASK"
+    # Determine gradle task
+    if [ "$OUTPUT_TYPE" = "bundle" ]; then
+        if [ "$BUILD_TYPE" = "release" ]; then
+            GRADLE_TASK="bundleRelease"
+        else
+            GRADLE_TASK="bundleDebug"
+        fi
+    else
+        if [ "$BUILD_TYPE" = "release" ]; then
+            GRADLE_TASK="assembleRelease"
+        else
+            GRADLE_TASK="assembleDebug"
+        fi
+    fi
+
+    # Build with signing if keystore provided
+    if [ -n "$KEYSTORE_PATH" ] && [ "$BUILD_TYPE" = "release" ]; then
+        echo "Building with signing..."
+        ./gradlew "$GRADLE_TASK" \
+            -Pandroid.injected.signing.store.file="$KEYSTORE_PATH" \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASS" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASS"
+    else
+        ./gradlew "$GRADLE_TASK"
+    fi
 fi
 
 # Copy output

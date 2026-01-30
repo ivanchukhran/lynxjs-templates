@@ -148,6 +148,11 @@ sed -i '' "s/Theme\.LynxTemplate/Theme.$APP_NAME/g" android/app/src/main/Android
 sed -i '' "s/Theme\.LynxTemplate/Theme.$APP_NAME/g" android/app/src/main/res/values/themes.xml
 sed -i '' "s/Theme\.LynxTemplate/Theme.$APP_NAME/g" android/app/src/main/res/values-night/themes.xml
 
+# Update Android fastlane files if they exist
+if [ -d "android/fastlane" ]; then
+    sed -i '' "s/com\.lynxtemplate/$PACKAGE_ID/g" android/fastlane/Appfile 2>/dev/null || true
+fi
+
 echo "  Android project configured: android/"
 
 # ============== Git ==============

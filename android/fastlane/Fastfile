@@ -2,7 +2,7 @@ default_platform(:android)
 
 platform :android do
   desc "Build Debug APK"
-  lane :debug do
+  lane :build_debug do
     gradle(
       task: "assemble",
       build_type: "Debug",
@@ -11,7 +11,7 @@ platform :android do
   end
 
   desc "Build Release APK"
-  lane :release do
+  lane :build_release do
     gradle(
       task: "assemble",
       build_type: "Release",
@@ -20,7 +20,7 @@ platform :android do
   end
 
   desc "Build Release App Bundle (AAB)"
-  lane :bundle do
+  lane :build_bundle do
     gradle(
       task: "bundle",
       build_type: "Release",
@@ -29,7 +29,7 @@ platform :android do
   end
 
   desc "Run tests"
-  lane :test do
+  lane :run_tests do
     gradle(
       task: "test"
     )
@@ -37,7 +37,7 @@ platform :android do
 
   desc "Deploy to Google Play Store (internal track)"
   lane :internal do
-    bundle
+    build_bundle
     upload_to_play_store(
       track: "internal",
       aab: "app/build/outputs/bundle/release/app-release.aab",
@@ -49,7 +49,7 @@ platform :android do
 
   desc "Deploy to Google Play Store (beta track)"
   lane :beta do
-    bundle
+    build_bundle
     upload_to_play_store(
       track: "beta",
       aab: "app/build/outputs/bundle/release/app-release.aab",
@@ -61,7 +61,7 @@ platform :android do
 
   desc "Deploy to Google Play Store (production)"
   lane :production do
-    bundle
+    build_bundle
     upload_to_play_store(
       track: "production",
       aab: "app/build/outputs/bundle/release/app-release.aab",
