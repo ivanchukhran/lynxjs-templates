@@ -11,6 +11,17 @@ Minimal native iOS and Android project templates for running LynxJS applications
 - For Android:
   - Android Studio with SDK (or just JDK 17+ for CI)
   - Gradle 8.x
+  - Android SDK with `ANDROID_HOME` environment variable set:
+    ```bash
+    # macOS (add to ~/.zshrc or ~/.bashrc)
+    export ANDROID_HOME="$HOME/Library/Android/sdk"
+    export PATH="$ANDROID_HOME/platform-tools:$PATH"
+
+    # Linux
+    export ANDROID_HOME="$HOME/Android/Sdk"
+    export PATH="$ANDROID_HOME/platform-tools:$PATH"
+    ```
+    Or the build script will auto-detect common SDK locations and create `local.properties`.
 
 ## Quick Start (Local)
 
@@ -70,6 +81,7 @@ Options:
   --build-type        debug or release (default: release)
   --output-type       apk or bundle (default: apk)
   --output            Output directory (default: ./build)
+  --use-fastlane      Use fastlane instead of direct Gradle
   --keystore          Path to keystore file
   --keystore-pass     Keystore password
   --key-alias         Key alias
@@ -130,6 +142,37 @@ bundle exec fastlane adhoc      # Ad-hoc build
 bundle exec fastlane beta       # Build and upload to TestFlight
 ```
 
+### Fastlane (Android)
+
+The template includes fastlane configuration for Android builds and Play Store deployment.
+
+**Setup:**
+
+```bash
+cd android
+bundle install
+```
+
+**Build commands:**
+
+```bash
+bundle exec fastlane build_debug    # Debug APK
+bundle exec fastlane build_release  # Release APK
+bundle exec fastlane build_bundle   # Release AAB
+bundle exec fastlane run_tests      # Run unit tests
+```
+
+**Deploy to Play Store:**
+
+```bash
+# First, add your Google Play JSON key to android/fastlane/google-play-key.json
+# Or set GOOGLE_PLAY_JSON_KEY environment variable
+
+bundle exec fastlane internal       # Deploy to internal track
+bundle exec fastlane beta           # Deploy to beta track
+bundle exec fastlane production     # Deploy to production
+```
+
 ## Project Structure
 
 ```
@@ -150,6 +193,10 @@ bundle exec fastlane beta       # Build and upload to TestFlight
 │   │   │   ├── java/com/lynxtemplate/
 │   │   │   └── assets/             # Put main.lynx.bundle here
 │   │   └── build.gradle.kts
+│   ├── fastlane/
+│   │   ├── Fastfile                # Fastlane lanes
+│   │   └── Appfile                 # Package name config
+│   ├── Gemfile
 │   └── gradle/
 │
 ├── scripts/

@@ -79,6 +79,39 @@ echo "Output type: $OUTPUT_TYPE"
 cd "$ROOT_DIR/android"
 mkdir -p "$ROOT_DIR/$OUTPUT_DIR"
 
+# Check for Android SDK
+if [ -z "$ANDROID_HOME" ] && [ -z "$ANDROID_SDK_ROOT" ]; then
+    # Try common locations
+    for sdk_path in "$HOME/Library/Android/sdk" "$HOME/Android/Sdk" "/usr/local/share/android-sdk"; do
+        if [ -d "$sdk_path" ]; then
+            export ANDROID_HOME="$sdk_path"
+            echo "Auto-detected Android SDK: $ANDROID_HOME"
+            break
+        fi
+    done
+fi
+
+# Create local.properties if SDK found but file missing
+if [ -n "$ANDROID_HOME" ] && [ ! -f "local.properties" ]; then
+    echo "sdk.dir=$ANDROID_HOME" > local.properties
+    echo "Created local.properties with SDK path"
+fi
+
+# Fail with helpful message if SDK not found
+if [ -z "$ANDROID_HOME" ] && [ -z "$ANDROID_SDK_ROOT" ] && [ ! -f "local.properties" ]; then
+    echo "Error: Android SDK not found."
+    echo ""
+    echo "Please do one of the following:"
+    echo "  1. Set ANDROID_HOME environment variable:"
+    echo "     export ANDROID_HOME=~/Library/Android/sdk"
+    echo ""
+    echo "  2. Install Android Studio (SDK installs to ~/Library/Android/sdk)"
+    echo ""
+    echo "  3. Create android/local.properties with:"
+    echo "     sdk.dir=/path/to/your/android/sdk"
+    exit 1
+fi
+
 # Determine output extension
 if [ "$OUTPUT_TYPE" = "bundle" ]; then
     OUTPUT_EXT="aab"
