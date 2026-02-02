@@ -8,13 +8,13 @@ set -e
 #   --scheme          Xcode scheme name (required)
 #   --export-method   Export method: app-store, ad-hoc, development (default: app-store)
 #   --output          Output directory (default: ./build)
-#   --use-fastlane    Use fastlane instead of xcodebuild
+#   --no-fastlane     Use xcodebuild instead of fastlane
 #   --help, -h        Show this help
 
 SCHEME=""
 EXPORT_METHOD="app-store"
 OUTPUT_DIR="./build"
-USE_FASTLANE=false
+USE_FASTLANE=true
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -30,8 +30,8 @@ while [[ $# -gt 0 ]]; do
             OUTPUT_DIR="$2"
             shift 2
             ;;
-        --use-fastlane)
-            USE_FASTLANE=true
+        --no-fastlane)
+            USE_FASTLANE=false
             shift
             ;;
         --help|-h)

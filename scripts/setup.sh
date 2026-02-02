@@ -105,11 +105,12 @@ if [ -n "$TEAM_ID" ]; then
 fi
 
 # Update fastlane files if they exist
-if [ -d "ios/fastlane" ]; then
-    sed -i '' "s/LynxTemplate/$APP_NAME/g" ios/fastlane/Fastfile 2>/dev/null || true
-    sed -i '' "s/com\.lynxtemplate/$PACKAGE_ID/g" ios/fastlane/Fastfile 2>/dev/null || true
-    sed -i '' "s/com\.lynxtemplate/$PACKAGE_ID/g" ios/fastlane/Matchfile 2>/dev/null || true
-    [ -n "$TEAM_ID" ] && sed -i '' "s/TEAM_ID_PLACEHOLDER/$TEAM_ID/g" ios/fastlane/Matchfile 2>/dev/null || true
+if [ -d "ios/$APP_NAME/fastlane" ]; then
+    sed -i '' "s/LynxTemplate/$APP_NAME/g" "ios/$APP_NAME/fastlane/Fastfile" 2>/dev/null || true
+    sed -i '' "s/com\.lynxtemplate/$PACKAGE_ID/g" "ios/$APP_NAME/fastlane/Fastfile" 2>/dev/null || true
+    sed -i '' "s/com\.lynxtemplate/$PACKAGE_ID/g" "ios/$APP_NAME/fastlane/Appfile" 2>/dev/null || true
+    sed -i '' "s/com\.lynxtemplate/$PACKAGE_ID/g" "ios/$APP_NAME/fastlane/Matchfile" 2>/dev/null || true
+    [ -n "$TEAM_ID" ] && sed -i '' "s/TEAM_ID_PLACEHOLDER/$TEAM_ID/g" "ios/$APP_NAME/fastlane/Matchfile" 2>/dev/null || true
 fi
 
 echo "  iOS project configured: ios/$APP_NAME"

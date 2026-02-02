@@ -8,11 +8,11 @@ set -e
 #   --build-type      Build type: debug, release (default: release)
 #   --output-type     Output type: apk, bundle (default: apk)
 #   --output          Output directory (default: ./build)
-#   --keystore        Path to keystore file (for release builds)
+#   --no-fastlane     Use direct Gradle instead of fastlane
+#   --keystore        Path to keystore file (for release builds, requires --no-fastlane)
 #   --keystore-pass   Keystore password (or use KEYSTORE_PASSWORD env var)
 #   --key-alias       Key alias (or use KEY_ALIAS env var)
 #   --key-pass        Key password (or use KEY_PASSWORD env var)
-#   --use-fastlane    Use fastlane instead of direct Gradle
 #   --help, -h        Show this help
 
 BUILD_TYPE="release"
@@ -22,7 +22,7 @@ KEYSTORE_PATH=""
 KEYSTORE_PASS="${KEYSTORE_PASSWORD:-}"
 KEY_ALIAS="${KEY_ALIAS:-}"
 KEY_PASS="${KEY_PASSWORD:-}"
-USE_FASTLANE=false
+USE_FASTLANE=true
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -54,8 +54,8 @@ while [[ $# -gt 0 ]]; do
             KEY_PASS="$2"
             shift 2
             ;;
-        --use-fastlane)
-            USE_FASTLANE=true
+        --no-fastlane)
+            USE_FASTLANE=false
             shift
             ;;
         --help|-h)

@@ -14,6 +14,10 @@ on:
       lynx_bundle_url:
         description: 'URL to download main.lynx.bundle (or artifact name)'
         required: true
+      android_no_fastlane:
+        description: 'Use direct Gradle instead of fastlane for Android build'
+        type: boolean
+        default: false
 
 env:
   APP_NAME: ${{ github.event.inputs.app_name }}
@@ -31,6 +35,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: Setup Ruby
+        if: ${{ github.event.inputs.android_no_fastlane != 'true' }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: android
 
       - name: Setup project
         run: |
@@ -57,15 +69,25 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          if [ -f "android/app/keystore.jks" ]; then
+          if [ "${{ github.event.inputs.android_no_fastlane }}" = "true" ] && [ -f "android/app/keystore.jks" ]; then
+            # Use Gradle directly with signing
             ./scripts/build-android.sh \
               --build-type release \
               --output-type apk \
+              --no-fastlane \
               --keystore "$(pwd)/android/app/keystore.jks" \
               --output ./artifacts
-          else
+          elif [ "${{ github.event.inputs.android_no_fastlane }}" = "true" ]; then
+            # Use Gradle directly without signing
             ./scripts/build-android.sh \
               --build-type debug \
+              --output-type apk \
+              --no-fastlane \
+              --output ./artifacts
+          else
+            # Use fastlane (default)
+            ./scripts/build-android.sh \
+              --build-type release \
               --output-type apk \
               --output ./artifacts
           fi

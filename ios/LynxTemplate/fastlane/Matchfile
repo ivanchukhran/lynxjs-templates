@@ -11,5 +11,5 @@ team_id("TEAM_ID_PLACEHOLDER")
 # Optional: Specify branch
 # git_branch("main")
 
-# For CI, use readonly mode and decrypt key from environment
-readonly(is_ci)
+# For CI, use readonly mode (set MATCH_READONLY=true or CI=true)
+readonly(ENV["CI"] == "true" || ENV["MATCH_READONLY"] == "true")

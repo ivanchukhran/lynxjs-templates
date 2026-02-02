@@ -69,7 +69,7 @@ Options:
   --scheme            Xcode scheme name (auto-detected if not provided)
   --export-method     Export method: app-store, ad-hoc, development
   --output            Output directory (default: ./build)
-  --use-fastlane      Use fastlane instead of xcodebuild
+  --no-fastlane       Use xcodebuild instead of fastlane (fastlane is default)
 ```
 
 ### Android Build Script
@@ -81,8 +81,8 @@ Options:
   --build-type        debug or release (default: release)
   --output-type       apk or bundle (default: apk)
   --output            Output directory (default: ./build)
-  --use-fastlane      Use fastlane instead of direct Gradle
-  --keystore          Path to keystore file
+  --no-fastlane       Use direct Gradle instead of fastlane (fastlane is default)
+  --keystore          Path to keystore file (requires --no-fastlane)
   --keystore-pass     Keystore password
   --key-alias         Key alias
   --key-pass          Key password
