@@ -96,6 +96,17 @@ fi
 find ios -type f \( -name "*.pbxproj" -o -name "*.swift" -o -name "*.h" -o -name "Podfile" \) \
     -exec sed -i '' "s/LynxTemplate/$APP_NAME/g" {} \;
 
+# Restore Lynx SDK types that shouldn't be renamed
+# Bridging header imports
+find ios -type f -name "*-Bridging-Header.h" \
+    -exec sed -i '' "s/<Lynx\/${APP_NAME}/<Lynx\/LynxTemplate/g" {} \;
+
+# Swift SDK protocol and type references
+find ios -type f -name "*.swift" \
+    -exec sed -i '' "s/NSObject, ${APP_NAME}Provider/NSObject, LynxTemplateProvider/g" {} \;
+find ios -type f -name "*.swift" \
+    -exec sed -i '' "s/${APP_NAME}LoadBlock/LynxTemplateLoadBlock/g" {} \;
+
 find ios -type f -name "*.pbxproj" \
     -exec sed -i '' "s/com\.lynxtemplate/$PACKAGE_ID/g" {} \;
 

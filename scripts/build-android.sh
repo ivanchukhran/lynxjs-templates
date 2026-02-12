@@ -120,51 +120,51 @@ else
 fi
 
 # Build using fastlane or direct Gradle
-if [ "$USE_FASTLANE" = true ]; then
-    # Ensure bundle is installed
-    if [ -f "Gemfile" ]; then
-        bundle check || bundle install
-    fi
-
-    # Determine fastlane lane
-    if [ "$OUTPUT_TYPE" = "bundle" ]; then
-        FASTLANE_LANE="build_bundle"
-    elif [ "$BUILD_TYPE" = "release" ]; then
-        FASTLANE_LANE="build_release"
-    else
-        FASTLANE_LANE="build_debug"
-    fi
-
-    echo "Running fastlane $FASTLANE_LANE..."
-    bundle exec fastlane "$FASTLANE_LANE"
-else
-    # Determine gradle task
-    if [ "$OUTPUT_TYPE" = "bundle" ]; then
-        if [ "$BUILD_TYPE" = "release" ]; then
-            GRADLE_TASK="bundleRelease"
-        else
-            GRADLE_TASK="bundleDebug"
-        fi
-    else
-        if [ "$BUILD_TYPE" = "release" ]; then
-            GRADLE_TASK="assembleRelease"
-        else
-            GRADLE_TASK="assembleDebug"
-        fi
-    fi
-
-    # Build with signing if keystore provided
-    if [ -n "$KEYSTORE_PATH" ] && [ "$BUILD_TYPE" = "release" ]; then
-        echo "Building with signing..."
-        ./gradlew "$GRADLE_TASK" \
-            -Pandroid.injected.signing.store.file="$KEYSTORE_PATH" \
-            -Pandroid.injected.signing.store.password="$KEYSTORE_PASS" \
-            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$KEY_PASS"
-    else
-        ./gradlew "$GRADLE_TASK"
-    fi
+# if [ "$USE_FASTLANE" = true ]; then
+# Ensure bundle is installed
+if [ -f "Gemfile" ]; then
+    bundle check || bundle install
 fi
+
+# Determine fastlane lane
+if [ "$OUTPUT_TYPE" = "bundle" ]; then
+    FASTLANE_LANE="build_bundle"
+elif [ "$BUILD_TYPE" = "release" ]; then
+    FASTLANE_LANE="build_release"
+else
+    FASTLANE_LANE="build_debug"
+fi
+
+echo "Running fastlane $FASTLANE_LANE..."
+bundle exec fastlane "$FASTLANE_LANE"
+# else
+#     # Determine gradle task
+#     if [ "$OUTPUT_TYPE" = "bundle" ]; then
+#         if [ "$BUILD_TYPE" = "release" ]; then
+#             GRADLE_TASK="bundleRelease"
+#         else
+#             GRADLE_TASK="bundleDebug"
+#         fi
+#     else
+#         if [ "$BUILD_TYPE" = "release" ]; then
+#             GRADLE_TASK="assembleRelease"
+#         else
+#             GRADLE_TASK="assembleDebug"
+#         fi
+#     fi
+
+#     # Build with signing if keystore provided
+#     if [ -n "$KEYSTORE_PATH" ] && [ "$BUILD_TYPE" = "release" ]; then
+#         echo "Building with signing..."
+#         ./gradlew "$GRADLE_TASK" \
+#             -Pandroid.injected.signing.store.file="$KEYSTORE_PATH" \
+#             -Pandroid.injected.signing.store.password="$KEYSTORE_PASS" \
+#             -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+#             -Pandroid.injected.signing.key.password="$KEY_PASS"
+#     else
+#         ./gradlew "$GRADLE_TASK"
+#     fi
+# fi
 
 # Copy output
 if [ "$OUTPUT_TYPE" = "bundle" ]; then

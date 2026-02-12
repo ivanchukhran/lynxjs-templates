@@ -67,7 +67,13 @@ Options:
 
 Options:
   --scheme            Xcode scheme name (auto-detected if not provided)
-  --export-method     Export method: app-store, ad-hoc, development
+  --export-method     Export method:
+                        app-store   - App Store release (requires Match)
+                        ad-hoc      - Ad-hoc distribution (requires Match)
+                        development - Development build (requires Match)
+                        dev         - Automatic signing (no Match needed)
+                        simulator   - Simulator build (no signing)
+                        build-only  - Compile validation only
   --output            Output directory (default: ./build)
   --no-fastlane       Use xcodebuild instead of fastlane (fastlane is default)
 ```
@@ -137,9 +143,16 @@ bundle exec fastlane match adhoc
 **Build commands:**
 
 ```bash
+# With Match certificates
 bundle exec fastlane release    # App Store build
 bundle exec fastlane adhoc      # Ad-hoc build
+bundle exec fastlane build      # Development build
 bundle exec fastlane beta       # Build and upload to TestFlight
+
+# Without certificates
+bundle exec fastlane simulator  # Simulator build (no signing)
+bundle exec fastlane dev        # Automatic signing (no Match)
+bundle exec fastlane build_only # Just validate compilation
 ```
 
 ### Fastlane (Android)

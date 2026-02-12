@@ -5,8 +5,14 @@ set -e
 # Usage: ./scripts/build-ios.sh [options]
 #
 # Options:
-#   --scheme          Xcode scheme name (required)
-#   --export-method   Export method: app-store, ad-hoc, development (default: app-store)
+#   --scheme          Xcode scheme name (auto-detected)
+#   --export-method   Export method (default: app-store):
+#                       app-store   - App Store release (requires Match)
+#                       ad-hoc      - Ad-hoc distribution (requires Match)
+#                       development - Development build (requires Match)
+#                       dev         - Development with automatic signing (no Match)
+#                       simulator   - Simulator build (no signing required)
+#                       build-only  - Compile validation only (no output)
 #   --output          Output directory (default: ./build)
 #   --no-fastlane     Use xcodebuild instead of fastlane
 #   --help, -h        Show this help
@@ -84,75 +90,85 @@ if [ -f "ios/$SCHEME/Podfile" ] && [ ! -d "ios/$SCHEME/Pods" ]; then
     WORKSPACE="ios/$SCHEME/$SCHEME.xcworkspace"
 fi
 
-if [ "$USE_FASTLANE" = true ]; then
-    echo "Building with fastlane..."
-    cd "ios/$SCHEME"
+# if [ "$USE_FASTLANE" = true ]; then
+echo "Building with fastlane..."
+cd "ios/$SCHEME"
 
-    case $EXPORT_METHOD in
-        app-store)
-            bundle exec fastlane release
-            ;;
-        ad-hoc)
-            bundle exec fastlane adhoc
-            ;;
-        *)
-            bundle exec fastlane build
-            ;;
-    esac
+case $EXPORT_METHOD in
+    app-store)
+        bundle exec fastlane release
+        ;;
+    ad-hoc)
+        bundle exec fastlane adhoc
+        ;;
+    simulator)
+        bundle exec fastlane simulator
+        ;;
+    dev)
+        bundle exec fastlane dev
+        ;;
+    build-only)
+        bundle exec fastlane build_only
+        ;;
+    *)
+        bundle exec fastlane build
+        ;;
+esac
 
-    # Copy artifacts
-    cp -r fastlane/output/* "$ROOT_DIR/$OUTPUT_DIR/" 2>/dev/null || true
-else
-    echo "Building with xcodebuild..."
+# Copy artifacts (not all lanes produce output)
+cp -r fastlane/output/* "$ROOT_DIR/$OUTPUT_DIR/" 2>/dev/null || true
+cp -r build/Build/Products/* "$ROOT_DIR/$OUTPUT_DIR/" 2>/dev/null || true
+# else
+#     echo "Building with xcodebuild..."
 
-    ARCHIVE_PATH="$OUTPUT_DIR/$SCHEME.xcarchive"
+#     ARCHIVE_PATH="$OUTPUT_DIR/$SCHEME.xcarchive"
 
-    # Determine build target
-    if [ -n "$WORKSPACE" ]; then
-        BUILD_TARGET="-workspace $WORKSPACE"
-    else
-        BUILD_TARGET="-project $PROJECT"
-    fi
+#     # Determine build target
+#     if [ -n "$WORKSPACE" ]; then
+#         BUILD_TARGET="-workspace $WORKSPACE"
+#     else
+#         BUILD_TARGET="-project $PROJECT"
+#     fi
 
-    # Archive
-    xcodebuild \
-        $BUILD_TARGET \
-        -scheme "$SCHEME" \
-        -configuration Release \
-        -archivePath "$ARCHIVE_PATH" \
-        -destination "generic/platform=iOS" \
-        archive \
-        CODE_SIGN_STYLE=Manual \
-        | xcpretty || xcodebuild \
-        $BUILD_TARGET \
-        -scheme "$SCHEME" \
-        -configuration Release \
-        -archivePath "$ARCHIVE_PATH" \
-        -destination "generic/platform=iOS" \
-        archive
+#     # Archive
+#     xcodebuild \
+#         $BUILD_TARGET \
+#         -scheme "$SCHEME" \
+#         -configuration Release \
+#         -archivePath "$ARCHIVE_PATH" \
+#         -destination "generic/platform=iOS" \
+#         archive \
+#         CODE_SIGN_STYLE=Manual \
+#         | xcpretty || xcodebuild \
+#         $BUILD_TARGET \
+#         -scheme "$SCHEME" \
+#         -configuration Release \
+#         -archivePath "$ARCHIVE_PATH" \
+#         -destination "generic/platform=iOS" \
+#         archive
 
-    # Create export options plist
-    EXPORT_OPTIONS="$OUTPUT_DIR/ExportOptions.plist"
-    cat > "$EXPORT_OPTIONS" << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>method</key>
-    <string>$EXPORT_METHOD</string>
-    <key>signingStyle</key>
-    <string>manual</string>
-</dict>
-</plist>
-EOF
+#     # Create export options plist
+#     EXPORT_OPTIONS="$OUTPUT_DIR/ExportOptions.plist"
+#     cat > "$EXPORT_OPTIONS" << EOF
+# <?xml version="1.0" encoding="UTF-8"?>
+# <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+# <plist version="1.0">
+# <dict>
+#     <key>method</key>
+#     <string>$EXPORT_METHOD</string>
+#     <key>signingStyle</key>
+#     <string>manual</string>
+# </dict>
+# </plist>
+# EOF
 
-    # Export IPA
-    xcodebuild \
-        -exportArchive \
-        -archivePath "$ARCHIVE_PATH" \
-        -exportPath "$OUTPUT_DIR" \
-        -exportOptionsPlist "$EXPORT_OPTIONS"
-fi
+#     # Export IPA
+#     xcodebuild \
+#         -exportArchive \
+#         -archivePath "$ARCHIVE_PATH" \
+#         -exportPath "$OUTPUT_DIR" \
+#         -exportOptionsPlist "$EXPORT_OPTIONS"
+# fi
 
 echo ""
 echo "Build complete! Output: $OUTPUT_DIR"

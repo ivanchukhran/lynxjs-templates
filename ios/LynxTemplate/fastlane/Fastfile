@@ -33,7 +33,7 @@ platform :ios do
     )
   end
 
-  desc "Build for Development"
+  desc "Build for Development (requires Match certificates)"
   lane :build do
     match(type: "development", readonly: true)
 
@@ -44,6 +44,50 @@ platform :ios do
       output_directory: "./fastlane/output",
       output_name: "LynxTemplate-dev.ipa"
     )
+  end
+
+  # ============== No-Certificate Options ==============
+
+  desc "Build for Simulator (no signing required)"
+  lane :simulator do
+    build_app(
+      workspace: "LynxTemplate.xcworkspace",
+      scheme: "LynxTemplate",
+      configuration: "Debug",
+      derived_data_path: "./build",
+      destination: "generic/platform=iOS Simulator",
+      skip_codesigning: true,
+      skip_archive: true
+    )
+    UI.success("Simulator build complete! Output: ./build")
+  end
+
+  desc "Build with automatic signing (no Match, uses Xcode signing)"
+  lane :dev do
+    build_app(
+      workspace: "LynxTemplate.xcworkspace",
+      scheme: "LynxTemplate",
+      configuration: "Debug",
+      export_method: "development",
+      export_options: {
+        signingStyle: "automatic"
+      },
+      output_directory: "./fastlane/output",
+      output_name: "LynxTemplate-dev.ipa"
+    )
+  end
+
+  desc "Compile only (validate code builds, no output)"
+  lane :build_only do
+    xcodebuild(
+      workspace: "LynxTemplate.xcworkspace",
+      scheme: "LynxTemplate",
+      configuration: "Debug",
+      build: true,
+      destination: "generic/platform=iOS",
+      xcargs: "CODE_SIGNING_ALLOWED=NO"
+    )
+    UI.success("Build validation complete!")
   end
 
   desc "Upload to App Store Connect"
