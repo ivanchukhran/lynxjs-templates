@@ -1,4 +1,4 @@
-package com.lynxtemplate
+package com.acme.shop
 
 import android.app.Application
 import com.facebook.drawee.backends.pipeline.Fresco
@@ -11,7 +11,7 @@ import com.lynx.service.log.LynxLogService
 import com.lynx.tasm.service.LynxServiceCenter
 import com.lynx.tasm.LynxEnv
 
-class LynxTemplateApp : Application() {
+class ShopAppApp : Application() {
 
     override fun onCreate() {
         super.onCreate()

@@ -1,6 +1,6 @@
 import Foundation
 
-class LynxTemplateProvider: NSObject, LynxTemplateProvider {
+class ShopAppProvider: NSObject, LynxTemplateProvider {
   func loadTemplate(withUrl url: String!, onComplete callback: LynxTemplateLoadBlock!) {
     if let filePath = Bundle.main.path(forResource: url, ofType: "bundle") {
       do {

@@ -12,11 +12,11 @@ platform :ios do
     sync_certs
 
     build_app(
-      workspace: "LynxTemplate.xcworkspace",
-      scheme: "LynxTemplate",
+      workspace: "ShopApp.xcworkspace",
+      scheme: "ShopApp",
       export_method: "app-store",
       output_directory: "./fastlane/output",
-      output_name: "LynxTemplate.ipa"
+      output_name: "ShopApp.ipa"
     )
   end
 
@@ -25,11 +25,11 @@ platform :ios do
     match(type: "adhoc", readonly: true)
 
     build_app(
-      workspace: "LynxTemplate.xcworkspace",
-      scheme: "LynxTemplate",
+      workspace: "ShopApp.xcworkspace",
+      scheme: "ShopApp",
       export_method: "ad-hoc",
       output_directory: "./fastlane/output",
-      output_name: "LynxTemplate-adhoc.ipa"
+      output_name: "ShopApp-adhoc.ipa"
     )
   end
 
@@ -38,11 +38,11 @@ platform :ios do
     match(type: "development", readonly: true)
 
     build_app(
-      workspace: "LynxTemplate.xcworkspace",
-      scheme: "LynxTemplate",
+      workspace: "ShopApp.xcworkspace",
+      scheme: "ShopApp",
       export_method: "development",
       output_directory: "./fastlane/output",
-      output_name: "LynxTemplate-dev.ipa"
+      output_name: "ShopApp-dev.ipa"
     )
   end
 
@@ -51,8 +51,8 @@ platform :ios do
   desc "Build for Simulator (no signing required)"
   lane :simulator do
     build_app(
-      workspace: "LynxTemplate.xcworkspace",
-      scheme: "LynxTemplate",
+      workspace: "ShopApp.xcworkspace",
+      scheme: "ShopApp",
       configuration: "Debug",
       derived_data_path: "./build",
       destination: "generic/platform=iOS Simulator",
@@ -65,23 +65,23 @@ platform :ios do
   desc "Build with automatic signing (no Match, uses Xcode signing)"
   lane :dev do
     build_app(
-      workspace: "LynxTemplate.xcworkspace",
-      scheme: "LynxTemplate",
+      workspace: "ShopApp.xcworkspace",
+      scheme: "ShopApp",
       configuration: "Debug",
       export_method: "development",
       export_options: {
         signingStyle: "automatic"
       },
       output_directory: "./fastlane/output",
-      output_name: "LynxTemplate-dev.ipa"
+      output_name: "ShopApp-dev.ipa"
     )
   end
 
   desc "Compile only (validate code builds, no output)"
   lane :build_only do
     xcodebuild(
-      workspace: "LynxTemplate.xcworkspace",
-      scheme: "LynxTemplate",
+      workspace: "ShopApp.xcworkspace",
+      scheme: "ShopApp",
       configuration: "Debug",
       build: true,
       destination: "generic/platform=iOS",

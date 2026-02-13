@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "com.lynxtemplate"
+    namespace = "com.acme.shop"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.lynxtemplate"
+        applicationId = "com.acme.shop"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

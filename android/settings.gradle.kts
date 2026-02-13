@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LynxTemplate"
+rootProject.name = "ShopApp"
 include(":app")

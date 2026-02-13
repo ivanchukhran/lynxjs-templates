@@ -2,7 +2,7 @@ source 'https://cdn.cocoapods.org/'
 
 platform :ios, '13.0'
 
-target 'LynxTemplate' do
+target 'ShopApp' do
   pod 'Lynx', '3.6.0', :subspecs => [
     'Framework',
   ]

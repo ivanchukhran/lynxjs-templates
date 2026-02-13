@@ -4,7 +4,7 @@ storage_mode("git")
 
 type("appstore")
 
-app_identifier("com.lynxtemplate")
+app_identifier("com.acme.shop")
 
 team_id("TEAM_ID_PLACEHOLDER")
 

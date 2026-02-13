@@ -1,2 +1,2 @@
 json_key_file(ENV["GOOGLE_PLAY_JSON_KEY"] || "fastlane/google-play-key.json")
-package_name("com.lynxtemplate")
+package_name("com.acme.shop")
