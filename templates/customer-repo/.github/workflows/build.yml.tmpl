@@ -34,7 +34,7 @@ jobs:
 
   build:
     needs: read-config
-    uses: __ORG__/lynxjs-template/.github/workflows/build-reusable.yml@master
+    uses: __ORG__/lynxjs-templates/.github/workflows/build-reusable.yml@master
     with:
       app_name: ${{ needs.read-config.outputs.app_name }}
       bundle_id: ${{ needs.read-config.outputs.bundle_id }}
