@@ -1,4 +1,4 @@
-package com.acme.shop
+package com.lynxtemplate
 
 import android.app.Activity
 import android.os.Bundle

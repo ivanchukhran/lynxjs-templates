@@ -6,7 +6,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         let lynxView = LynxView { builder in
-          builder.config = LynxConfig(provider: ShopAppProvider())
+          builder.config = LynxConfig(provider: LynxTemplateProvider())
           builder.screenSize = self.view.frame.size
           builder.fontScale = 1.0
         }

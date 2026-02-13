@@ -1,41 +1,30 @@
-name: Build ShopApp
+name: Build iOS & Android
 
 on:
-  repository_dispatch:
-    types: [build]
   workflow_dispatch:
     inputs:
-      lynx_bundle_url:
-        description: 'URL to download main.lynx.bundle'
+      app_name:
+        description: 'App name'
         required: true
-      build_android:
-        description: 'Build Android'
+        default: 'MyApp'
+      bundle_id:
+        description: 'Bundle/Package ID'
+        required: true
+        default: 'com.example.myapp'
+      lynx_bundle_url:
+        description: 'URL to download main.lynx.bundle (or artifact name)'
+        required: true
+      android_no_fastlane:
+        description: 'Use direct Gradle instead of fastlane for Android build'
         type: boolean
-        default: true
-      build_ios:
-        description: 'Build iOS'
-        type: boolean
-        default: true
+        default: false
 
 jobs:
-  read-config:
-    runs-on: ubuntu-latest
-    outputs:
-      app_name: ${{ steps.config.outputs.app_name }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Read customer config
-        id: config
-        run: |
-          echo "app_name=$(yq '.app_name' config.yml)" >> "$GITHUB_OUTPUT"
-
   build:
-    needs: read-config
-    uses: ivanchukhran/lynxjs-templates/.github/workflows/build-reusable.yml@master
+    uses: ./.github/workflows/build-reusable.yml
     with:
-      app_name: ${{ needs.read-config.outputs.app_name }}
-      lynx_bundle_url: ${{ github.event.client_payload.bundle_url || github.event.inputs.lynx_bundle_url }}
-      build_android: ${{ github.event_name == 'repository_dispatch' || github.event.inputs.build_android == 'true' }}
-      build_ios: ${{ github.event_name == 'repository_dispatch' || github.event.inputs.build_ios == 'true' }}
+      app_name: ${{ github.event.inputs.app_name }}
+      bundle_id: ${{ github.event.inputs.bundle_id }}
+      lynx_bundle_url: ${{ github.event.inputs.lynx_bundle_url }}
+      android_no_fastlane: ${{ github.event.inputs.android_no_fastlane == 'true' }}
     secrets: inherit

@@ -1,4 +1,4 @@
-package com.acme.shop
+package com.lynxtemplate
 
 import android.content.Context
 import com.lynx.tasm.provider.AbsTemplateProvider

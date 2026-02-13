@@ -1,6 +1,6 @@
 //
-//  ShopApp-Bridging-Header.h
-//  ShopApp
+//  LynxTemplate-Bridging-Header.h
+//  LynxTemplate
 //
 
 #import <Lynx/LynxConfig.h>
