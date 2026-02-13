@@ -1,0 +1,44 @@
+name: Build __APP_NAME__
+
+on:
+  repository_dispatch:
+    types: [build]
+  workflow_dispatch:
+    inputs:
+      lynx_bundle_url:
+        description: 'URL to download main.lynx.bundle'
+        required: true
+      build_android:
+        description: 'Build Android'
+        type: boolean
+        default: true
+      build_ios:
+        description: 'Build iOS'
+        type: boolean
+        default: true
+
+jobs:
+  read-config:
+    runs-on: ubuntu-latest
+    outputs:
+      app_name: ${{ steps.config.outputs.app_name }}
+      bundle_id: ${{ steps.config.outputs.bundle_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read customer config
+        id: config
+        run: |
+          echo "app_name=$(yq '.app_name' config.yml)" >> "$GITHUB_OUTPUT"
+          echo "bundle_id=$(yq '.bundle_id' config.yml)" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: read-config
+    uses: __ORG__/lynxjs-template/.github/workflows/build-reusable.yml@master
+    with:
+      app_name: ${{ needs.read-config.outputs.app_name }}
+      bundle_id: ${{ needs.read-config.outputs.bundle_id }}
+      lynx_bundle_url: ${{ github.event.client_payload.bundle_url || github.event.inputs.lynx_bundle_url }}
+      build_android: ${{ github.event_name == 'repository_dispatch' || github.event.inputs.build_android == 'true' }}
+      build_ios: ${{ github.event_name == 'repository_dispatch' || github.event.inputs.build_ios == 'true' }}
+    secrets: inherit
