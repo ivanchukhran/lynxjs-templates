@@ -139,8 +139,9 @@ cp -R "$ROOT_DIR/ios" "$TMPDIR/repo/ios"
 cp -R "$ROOT_DIR/android" "$TMPDIR/repo/android"
 cp -R "$ROOT_DIR/scripts" "$TMPDIR/repo/scripts"
 
-# Run setup.sh to configure for this customer
+# Run setup.sh inside the customer repo
 echo "Configuring project for ${APP_NAME}..."
+cd "$TMPDIR/repo"
 ./scripts/setup.sh \
     --name "$APP_NAME" \
     --bundle-id "$BUNDLE_ID" \
