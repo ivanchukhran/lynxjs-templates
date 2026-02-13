@@ -4,29 +4,29 @@ on:
   workflow_call:
     inputs:
       app_name:
-        description: 'App name'
+        description: "App name"
         required: true
         type: string
       bundle_id:
-        description: 'Bundle/Package ID'
+        description: "Bundle/Package ID"
         required: true
         type: string
       lynx_bundle_url:
-        description: 'URL to download main.lynx.bundle'
+        description: "URL to download main.lynx.bundle"
         required: true
         type: string
       android_no_fastlane:
-        description: 'Use direct Gradle instead of fastlane for Android build'
+        description: "Use direct Gradle instead of fastlane for Android build"
         required: false
         type: boolean
         default: false
       build_android:
-        description: 'Build Android'
+        description: "Build Android"
         required: false
         type: boolean
         default: true
       build_ios:
-        description: 'Build iOS'
+        description: "Build iOS"
         required: false
         type: boolean
         default: true
@@ -68,14 +68,14 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Setup Ruby
         if: ${{ !inputs.android_no_fastlane }}
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: "3.2"
           bundler-cache: true
           working-directory: android
 
@@ -92,7 +92,7 @@ jobs:
           cp main.lynx.bundle android/app/src/main/assets/
 
       - name: Decode keystore
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        # if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
@@ -143,7 +143,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: "3.2"
           bundler-cache: true
 
       - name: Setup project
