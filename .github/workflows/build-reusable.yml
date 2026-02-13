@@ -4,11 +4,7 @@ on:
   workflow_call:
     inputs:
       app_name:
-        description: "App name"
-        required: true
-        type: string
-      bundle_id:
-        description: "Bundle/Package ID"
+        description: "App name (must match the configured project name)"
         required: true
         type: string
       lynx_bundle_url:
@@ -60,9 +56,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APP_NAME: ${{ inputs.app_name }}
-      BUNDLE_ID: ${{ inputs.bundle_id }}
     steps:
-      - name: Checkout template
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Java
@@ -79,24 +74,18 @@ jobs:
           bundler-cache: true
           working-directory: android
 
-      - name: Setup project
-        run: |
-          ./scripts/setup.sh \
-            --name "$APP_NAME" \
-            --bundle-id "$BUNDLE_ID" \
-            --skip-git
-
       - name: Download LynxJS bundle
         run: |
           curl -L "${{ inputs.lynx_bundle_url }}" -o main.lynx.bundle
           cp main.lynx.bundle android/app/src/main/assets/
 
       - name: Decode keystore
-        # if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/keystore.jks
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/keystore.jks
+          fi
 
       - name: Build Android APK
         env:
@@ -135,9 +124,8 @@ jobs:
     runs-on: macos-latest
     env:
       APP_NAME: ${{ inputs.app_name }}
-      BUNDLE_ID: ${{ inputs.bundle_id }}
     steps:
-      - name: Checkout template
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Ruby
@@ -145,14 +133,6 @@ jobs:
         with:
           ruby-version: "3.2"
           bundler-cache: true
-
-      - name: Setup project
-        run: |
-          ./scripts/setup.sh \
-            --name "$APP_NAME" \
-            --bundle-id "$BUNDLE_ID" \
-            --ios-team-id "${{ secrets.APPLE_TEAM_ID }}" \
-            --skip-git
 
       - name: Download LynxJS bundle
         run: |

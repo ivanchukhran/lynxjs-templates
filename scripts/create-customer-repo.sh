@@ -133,11 +133,21 @@ trap 'rm -rf "$TMPDIR"' EXIT
 echo "Cloning repo..."
 gh repo clone "$REPO_FULL" "$TMPDIR/repo"
 
-# Copy templates and replace placeholders
-echo "Generating files from templates..."
-cd "$TMPDIR/repo"
+# Copy native code from template
+echo "Copying native project files..."
+cp -R "$ROOT_DIR/ios" "$TMPDIR/repo/ios"
+cp -R "$ROOT_DIR/android" "$TMPDIR/repo/android"
+cp -R "$ROOT_DIR/scripts" "$TMPDIR/repo/scripts"
 
-# Process each template file
+# Run setup.sh to configure for this customer
+echo "Configuring project for ${APP_NAME}..."
+./scripts/setup.sh \
+    --name "$APP_NAME" \
+    --bundle-id "$BUNDLE_ID" \
+    --skip-git
+
+# Generate workflow and config from templates
+echo "Generating CI files..."
 find "$TEMPLATE_DIR" -name "*.tmpl" | while read -r tmpl_file; do
     # Get relative path and strip .tmpl suffix
     rel_path="${tmpl_file#$TEMPLATE_DIR/}"
